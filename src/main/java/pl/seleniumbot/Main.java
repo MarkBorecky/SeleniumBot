@@ -8,8 +8,12 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
-import java.security.Key;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static pl.seleniumbot.Utils.parseToSeconds;
+import static pl.seleniumbot.Utils.sleep;
 
 
 public class Main {
@@ -17,12 +21,85 @@ public class Main {
     static final String url = "https://tx3.travian.com/dorf1.php";
     static final String login = "konfucjusz";
     static final String password = "SuomenMestari4";
+    static Map<Integer, WebElement> mapOfResourceFields;
 
     public static void main(String[] args) {
+        WebDriver driver = null;
+        try {
+            driver = new FirefoxDriver();
+            login(driver);
+            goToResources(driver);
+            mapOfResourceFields = getMapOfResourceFields(driver);
 
-        // Tworze encje driver
-        WebDriver driver = new FirefoxDriver();
+//            for (int i=2; i<=18; i++) {
+                buildResourceFiledd(driver, 16);
+//            }
 
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException();
+        } finally {
+//            driver.close();
+//            System.exit(0);
+        }
+    }
+
+    private static void buildResourceFiledd(WebDriver driver, int id) {
+        goToResources(driver);
+        build(driver, id);
+    }
+
+    private static void build(WebDriver driver, int i) {
+        WebElement element = mapOfResourceFields.get(i);
+        element.click();
+        // tutaj używam metody findElement bez s
+        // zwróci ona tylko jeden element a nie listę jak poprzednio
+        WebElement section1 = driver.findElement(By.className("section1"));
+        String duration = section1.findElement(By.className("duration")).getText();
+        int seconds = parseToSeconds(duration);
+        System.out.println("Budowa zostanie ukończona za " + duration + "!");
+
+        // można też wyszukać element po tagu np <button>
+        section1.findElement(By.tagName("button")).click();
+        sleep(seconds);
+    }
+
+    private static Map<Integer, WebElement> getMapOfResourceFields(WebDriver driver) {
+        List<WebElement> elements = driver.findElement(By.id("resourceFieldContainer"))
+                .findElements(By.className("good"));
+        Map<Integer, WebElement> map = new HashMap<>();
+        // <div onclick="window.location.href='/build.php?id=6'" class="good level colorLayer gid2 buildingSlot6  level0"><div class="labelLayer"></div></div>
+        for (WebElement el : elements) {
+            String[] classes = el.getAttribute("class").split(" ");
+            // good level colorLayer gid1 buildingSlot1  level2
+            Integer id = null;
+            for (String cl: classes) {
+                // Szukam Stringa który zawiera słowa buildingSlot
+                if (cl.contains("buildingSlot")){
+                    // wycinam z niego przedrostek, tak żeby została tylko liczba
+                    String substring = cl.substring(12);
+                    // parsuje Stringa np. "1" na int 1
+                    id = Integer.valueOf(substring);
+                }
+            }
+
+            map.put(id, el);
+        }
+        return map;
+    }
+
+    private static void goToResources(WebDriver driver) {
+        if (!driver.getCurrentUrl().contains("dorf1.php")) {
+            List<WebElement> elements = driver.findElements(By.className("resourceView"));
+            if (elements.size() == 1) {
+                elements.get(0).click();
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
+
+    private static void login(WebDriver driver) {
         // podaję url na który przeglądarka ma przejsć
         // można też użyć metody navigate
         driver.get(url);
@@ -70,9 +147,5 @@ public class Main {
 
         // Wyszukuję przycisk o id s1 (przycisk z napisem login) i symuluję kliknięcie
         driver.findElement(By.id("s1")).click();
-
-
-//        driver.close();
-//        System.exit(0);
     }
 }
