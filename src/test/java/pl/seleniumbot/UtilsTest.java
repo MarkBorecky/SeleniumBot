@@ -34,7 +34,7 @@ public class UtilsTest {
 
     @Test
     void shouldReadResourceFieldFromString() {
-        ResourceField resourceField = ResourceFieldFactory.create("good level colorLayer gid4 buildingSlot28 level19");
+        ResourceField resourceField = ResourceFieldFactory.create("good level colorLayer gid4 buildingSlot28  level19");
         Assertions.assertThat(resourceField).usingRecursiveComparison()
                 .isEqualTo(ResourceField.builder()
                         .type(CROP)

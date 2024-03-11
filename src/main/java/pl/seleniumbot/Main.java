@@ -4,7 +4,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import pl.seleniumbot.model.ResourceField;
 import pl.seleniumbot.model.ResourceFieldFactory;
+import pl.seleniumbot.model.ResourceType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,17 +31,14 @@ public class Main {
             System.setProperty("webdriver.gecko.driver", "src/main/resources/geckodriver");
             driver = new FirefoxDriver();
             login(driver);
-//            goToResources(driver);
-            mapOfResourceFields = scanVilage(driver);
+            mapOfResourceFields = scanVillage(driver);
+            System.out.printf("");
 
-//            for (int i=2; i<=18; i++) {
-//            buildResourceFiledd(driver, 16);
-//            }
 
         } catch (Exception e) {
-//            e.printStackTrace();
+            e.printStackTrace();
         } finally {
-//            driver.close();
+            driver.close();
 //            System.exit(0);
         }
     }
@@ -64,16 +63,19 @@ public class Main {
         sleep(seconds);
     }
 
-    private static Map<Integer, WebElement> scanVilage(WebDriver driver) {
+    private static Map<Integer, WebElement> scanVillage(WebDriver driver) {
 
         String out = "https://ts20.x2.europe.travian.com/dorf1.php";
         driver.get(out);
         List<WebElement> fields = driver.findElement(By.id("resourceFieldContainer"))
                 .findElements(By.className("good"));
-//        fields.stream()
-//                .map(WebElement::getClass)
-//                .map(ResourceFieldFactory::create).toList();
+        Map<ResourceType, List<ResourceField>> resourceFields = fields.stream()
+                .map(we -> we.getAttribute("class"))
+                .filter(cl -> cl.startsWith("good"))
+                .map(ResourceFieldFactory::create)
+                .collect(Collectors.groupingBy(ResourceField::getType));
 
+        System.out.println("resource:" + resourceFields);
 
         String in = "https://ts20.x2.europe.travian.com/dorf2.php";
         List<WebElement> elements = driver.findElements(By.id("resourceFieldContainer"));
