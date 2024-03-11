@@ -34,12 +34,12 @@ public class UtilsTest {
 
     @Test
     void shouldReadResourceFieldFromString() {
-        ResourceField resourceField = ResourceFieldFactory.create("");
+        ResourceField resourceField = ResourceFieldFactory.create("good level colorLayer gid4 buildingSlot28 level19");
         Assertions.assertThat(resourceField).usingRecursiveComparison()
                 .isEqualTo(ResourceField.builder()
                         .type(CROP)
-                        .id(8)
-                        .level(0)
+                        .id(28)
+                        .level(19)
                         .build());
     }
 }
