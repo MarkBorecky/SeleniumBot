@@ -1,12 +1,12 @@
 package pl.seleniumbot;
 
+import org.eclipse.collections.api.list.MutableList;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import pl.seleniumbot.model.ResourceField;
 import pl.seleniumbot.model.ResourceFieldFactory;
-import pl.seleniumbot.model.ResourceType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -65,17 +65,9 @@ public class Main {
 
     private static Map<Integer, WebElement> scanVillage(WebDriver driver) {
 
-        String out = "https://ts20.x2.europe.travian.com/dorf1.php";
-        driver.get(out);
-        List<WebElement> fields = driver.findElement(By.id("resourceFieldContainer"))
-                .findElements(By.className("good"));
-        Map<ResourceType, List<ResourceField>> resourceFields = fields.stream()
-                .map(we -> we.getAttribute("class"))
-                .filter(cl -> cl.startsWith("good"))
-                .map(ResourceFieldFactory::create)
-                .collect(Collectors.groupingBy(ResourceField::getType));
-
-        System.out.println("resource:" + resourceFields);
+        driver.get("https://ts20.x2.europe.travian.com/dorf1.php");
+        String resourceFieldContainerText = driver.findElement(By.id("resourceFieldContainer")).getText();
+        MutableList<ResourceField> resourceFields = ResourceFieldFactory.create(resourceFieldContainerText);
 
         String in = "https://ts20.x2.europe.travian.com/dorf2.php";
         List<WebElement> elements = driver.findElements(By.id("resourceFieldContainer"));
