@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-//TODO: inline with Building class
-public class ResourceField {
-    private ResourceType type;
+//TODO: inline with ResourceFiled class
+public class Building {
+    private BuildingType type;
     private int level;
     private int id;
 }

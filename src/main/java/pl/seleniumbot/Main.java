@@ -5,8 +5,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import pl.seleniumbot.model.Building;
 import pl.seleniumbot.model.ResourceField;
 import pl.seleniumbot.model.ResourceFieldFactory;
+import pl.seleniumbot.model.InfrastructureFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,14 +34,11 @@ public class Main {
             driver = new FirefoxDriver();
             login(driver);
             mapOfResourceFields = scanVillage(driver);
-            System.out.printf("");
-
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             driver.close();
-//            System.exit(0);
         }
     }
 
@@ -68,6 +67,11 @@ public class Main {
         driver.get("https://ts20.x2.europe.travian.com/dorf1.php");
         String resourceFieldContainerText = driver.findElement(By.id("resourceFieldContainer")).getText();
         MutableList<ResourceField> resourceFields = ResourceFieldFactory.create(resourceFieldContainerText);
+
+        driver.get("https://ts20.x2.europe.travian.com/dorf2.php");
+        WebElement villageContent = driver.findElement(By.id("villageContent"));
+        MutableList<Building> infrastructure = InfrastructureFactory.create(villageContent);
+        MutableList<Building> infrastructure2 = InfrastructureFactory.create2(villageContent.getText());
 
         String in = "https://ts20.x2.europe.travian.com/dorf2.php";
         List<WebElement> elements = driver.findElements(By.id("resourceFieldContainer"));
