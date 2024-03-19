@@ -65,11 +65,10 @@
             <artifactId>commons-text</artifactId>
             <version>1.3</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.stripe/stripe-java -->
         <dependency>
-            <groupId>com.stripe</groupId>
-            <artifactId>stripe-java</artifactId>
-            <version>24.20.0-beta.1</version>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.2</version>
         </dependency>
 
     </dependencies>

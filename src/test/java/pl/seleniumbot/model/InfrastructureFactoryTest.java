@@ -1,12 +1,7 @@
 package pl.seleniumbot.model;
 
 import org.eclipse.collections.api.list.MutableList;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebElement;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class InfrastructureFactoryTest {
 
@@ -103,7 +98,8 @@ class InfrastructureFactoryTest {
                 </svg>
                 </div>            </div>
                 """;
-        MutableList<Building> buildings = InfrastructureFactory.create2(text);
+        InfrastructureFactory factory = new InfrastructureFactory();
+        MutableList<Building> buildings = factory.createFrom(text);
         System.out.printf("");
     }
 }

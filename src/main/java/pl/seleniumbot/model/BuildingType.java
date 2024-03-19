@@ -51,4 +51,13 @@ public enum BuildingType {
     TREASURY(27),
     WONDER_OF_THE_WORLD(40);
     public final int id;
+
+    public static BuildingType getById(int id) {
+        for (BuildingType type : BuildingType.values()) {
+            if (type.id == id) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("BuilingType with id %d doesn't exist".formatted(id));
+    }
 }

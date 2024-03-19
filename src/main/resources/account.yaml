@@ -1,0 +1,4 @@
+#!!pl.seleniumbot.configuration.Account
+login: "konfucjusz"
+password: "SuomenMestari4"
+url: "https://ts20.x2.europe.travian.com"
