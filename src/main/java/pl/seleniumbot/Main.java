@@ -104,7 +104,7 @@ public class Main {
                 .collect(Collectors.toMap(webElement -> webElement.getAttribute("name"), Function.identity()));
 
         formFields.get("name").sendKeys(account.getLogin());
-        formFields.get("password").sendKeys(account.getLogin());
+        formFields.get("password").sendKeys(account.getPassword());
         driver.findElement(By.xpath("//button[@type='submit']")).click();
     }
 }
