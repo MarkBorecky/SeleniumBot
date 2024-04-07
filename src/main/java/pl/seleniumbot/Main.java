@@ -89,7 +89,7 @@ public class Main {
         if (!driver.getCurrentUrl().contains("dorf1.php")) {
             List<WebElement> elements = driver.findElements(By.className("resourceView"));
             if (elements.size() == 1) {
-                elements.get(0).click();
+                elements.getFirst().click();
             } else {
                 throw new IllegalArgumentException();
             }
