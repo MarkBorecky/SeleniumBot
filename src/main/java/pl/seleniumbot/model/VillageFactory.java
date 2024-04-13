@@ -7,10 +7,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import pl.seleniumbot.jsoup.MyDocument;
+import pl.seleniumbot.model.village.Village;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -18,42 +16,43 @@ import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class VillageFactory {
-
-    private final WebDriver driver;
-
-    private static final Pattern PATTERN = Pattern.compile("good level colorLayer gid(\\d{1,2})+ buildingSlot(\\d{1,2})+  level(\\d{1,2})+");
+    private static final Pattern PATTERN = Pattern.compile("good level colorLayer gid(\\d{1,2})+ buildingSlot(\\d{1,2})+ {2}level(\\d{1,2})+");
     private static final String LUMBER_ID = "l1";
     private static final String CLAY_ID = "l2";
     private static final String IRON_ID = "l3";
     private static final String CROP_ID = "l4";
     private static final String FREE_CROP_PRODUCTION_ID = "stockBarFreeCrop";
 
-
-    public Village createVilage() {
-
-        driver.get("https://ts20.x2.europe.travian.com/dorf1.php");
-        String resourceFieldContainerText = driver.findElement(By.id("resourceFieldContainer")).getText();
-        MutableList<ResourceField> resourceFields = this.create(resourceFieldContainerText);
-
-
-        //resourceStores
-        WebElement stockBarElement = driver.findElement(By.id("stockBar"));
-        VillageStock stock = this.createStock(stockBarElement.getText());
-
-        driver.get("https://ts20.x2.europe.travian.com/dorf2.php");
-        WebElement villageContent = driver.findElement(By.id("villageContent"));
-        MutableList<Building> infrastructure = this.createFrom(villageContent.getText());
-
-        //unitMovement
-
-        //building
-
-
-
-        return null;
+    public interface StockBarFactory {
+        VillageCenterFactory withStockBar(String stockBarHtml);
     }
 
-    public MutableList<Building> createFrom(String text) {
+    public interface VillageCenterFactory {
+        Village withVillageCenterFactory(String villageCenterHtml);
+    }
+
+    public interface ResourceFieldsFactory {
+        StockBarFactory withResourceFields(String resourceFieldsHtml);
+    }
+
+    public StockBarFactory withResourceFields(String resourceFieldsHtml) {
+        ResourceFieldsFactory resourceFieldsFactory = resource -> stock -> center -> createVillage(resource, stock, center);
+        return resourceFieldsFactory.withResourceFields(resourceFieldsHtml);
+    }
+
+    private Village createVillage(String resourceFieldHtml, String stockBarHtml, String villageCenterFactory) {
+        MutableList<ResourceField> resourceFields = this.createResourceFields(resourceFieldHtml);
+        VillageStock stock = this.createStock(stockBarHtml);
+        MutableList<Building> buildings = this.createVillageCenter(villageCenterFactory);
+
+        return Village.builder()
+                .resourceFields(resourceFields)
+                .stock(stock)
+                .buildings(buildings)
+                .build();
+    }
+
+    private MutableList<Building> createVillageCenter(String text) {
         Document document = Jsoup.parse(text);
         Elements els = document.getElementsByClass("buildingSlot");
         return Lists.mutable.fromStream(els.stream())
@@ -64,7 +63,7 @@ public class VillageFactory {
                         .build());
     }
 
-    public MutableList<ResourceField> create(String resourceFieldContainerText) {
+    private MutableList<ResourceField> createResourceFields(String resourceFieldContainerText) {
         Matcher matcher = PATTERN.matcher(resourceFieldContainerText);
         List<ResourceField> fields = matcher.results().map(m -> ResourceField.builder()
                         .type(ResourceType.fromId(Integer.parseInt(m.group(1))))
@@ -83,7 +82,7 @@ public class VillageFactory {
         return Integer.parseInt(a.attr("data-level"));
     }
 
-    public VillageStock createStock(String stockBarElementHtml) {
+    private VillageStock createStock(String stockBarElementHtml) {
         MyDocument document = MyDocument.createFrom(stockBarElementHtml);
         //warehouse
         int warehouseCapacity = document.fetchFirstByClass("warehouse", "capacity", "value")

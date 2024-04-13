@@ -10,12 +10,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class Configuration {
+@Getter
+public class AccountConfiguration {
     private static final String configurationFileName = "./src/main/resources/account.yaml";
-    @Getter
-    private Account account;
+    private final Account account;
 
-    public Configuration() {
+    public AccountConfiguration() {
         Yaml yaml = new Yaml(new Constructor(Account.class, new LoaderOptions()));
         try {
             InputStream inputStream = Files.newInputStream(Paths.get(configurationFileName));
@@ -23,5 +23,17 @@ public class Configuration {
         } catch (IOException e) {
             throw new IllegalArgumentException("Cannot read configuration file", e);
         }
+    }
+
+    public String getUrl() {
+        return account.getUrl();
+    }
+
+    public CharSequence getLogin() {
+        return account.getUrl();
+    }
+
+    public CharSequence getPassword() {
+        return account.getPassword();
     }
 }

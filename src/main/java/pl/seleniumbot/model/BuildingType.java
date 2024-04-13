@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum BuildingType {
+    EMPTY_SLOT(0),
     BAKERY(9),
     BRICKYARD(6),
     CLAY_PIT(2),
