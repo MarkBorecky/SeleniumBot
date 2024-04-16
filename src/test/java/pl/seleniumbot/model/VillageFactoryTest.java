@@ -1,11 +1,11 @@
 package pl.seleniumbot.model;
 
 import org.assertj.core.api.SoftAssertions;
-import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.impl.factory.Lists;
 import org.junit.jupiter.api.Test;
 import pl.seleniumbot.model.village.Village;
 
+import static org.assertj.core.groups.Tuple.tuple;
+import static pl.seleniumbot.model.BuildingType.*;
 import static pl.seleniumbot.model.ResourceType.*;
 
 class VillageFactoryTest {
@@ -214,16 +214,59 @@ class VillageFactoryTest {
 
         SoftAssertions.assertSoftly(soft -> {
             soft.assertThat(village.getStock()).isEqualTo(expectedStock);
-            MutableList<ResourceField> resourceFields = Lists.mutable.ofAll(village.getResourceFields());
-            soft.assertThat(resourceFields).hasSize(18);
-            soft.assertThat(resourceFields.select(res -> res.getType() == LUMBER)).hasSize(4);
-            soft.assertThat(resourceFields.select(res -> res.getType() == LUMBER)).containsExactlyInAnyOrder(ResourceField.builder().type(LUMBER).level(2).id(1).build(), ResourceField.builder().type(LUMBER).level(0).id(3).build(), ResourceField.builder().type(LUMBER).level(0).id(14).build(), ResourceField.builder().type(LUMBER).level(0).id(17).build());
-            soft.assertThat(resourceFields.select(res -> res.getType() == IRON)).hasSize(4);
-            soft.assertThat(resourceFields.select(res -> res.getType() == IRON)).containsExactlyInAnyOrder(ResourceField.builder().type(IRON).level(0).id(4).build(), ResourceField.builder().type(IRON).level(0).id(7).build(), ResourceField.builder().type(IRON).level(0).id(10).build(), ResourceField.builder().type(IRON).level(0).id(11).build());
-            soft.assertThat(resourceFields.select(res -> res.getType() == CLAY)).hasSize(4);
-            soft.assertThat(resourceFields.select(res -> res.getType() == CLAY)).containsExactlyInAnyOrder(ResourceField.builder().type(CLAY).level(1).id(5).build(), ResourceField.builder().type(CLAY).level(0).id(6).build(), ResourceField.builder().type(CLAY).level(2).id(16).build(), ResourceField.builder().type(CLAY).level(0).id(18).build());
-            soft.assertThat(resourceFields.select(res -> res.getType() == CROP)).hasSize(6);
-            soft.assertThat(resourceFields.select(res -> res.getType() == CROP)).containsExactlyInAnyOrder(ResourceField.builder().type(CROP).level(2).id(2).build(), ResourceField.builder().type(CROP).level(0).id(8).build(), ResourceField.builder().type(CROP).level(0).id(9).build(), ResourceField.builder().type(CROP).level(0).id(12).build(), ResourceField.builder().type(CROP).level(0).id(13).build(), ResourceField.builder().type(CROP).level(0).id(15).build());
+            soft.assertThat(village.getResourceFields()).hasSize(18);
+            //select(res -> res.getType() == LUMBER))
+            soft.assertThat(village.getResourceFields())
+                    .filteredOn("type", LUMBER)
+                    .hasSize(4)
+                    .extracting("level", "id")
+                    .containsExactlyInAnyOrder(
+                            tuple(2, 1),
+                            tuple(0, 3),
+                            tuple(0, 14),
+                            tuple(0, 17)
+                    );
+            soft.assertThat(village.getResourceFields())
+                    .filteredOn("type", IRON)
+                    .hasSize(4)
+                    .extracting("level", "id")
+                    .containsExactlyInAnyOrder(
+                            tuple(0, 4),
+                            tuple(0, 7),
+                            tuple(0, 10),
+                            tuple(0, 11)
+                    );
+            soft.assertThat(village.getResourceFields())
+                    .filteredOn("type", CLAY)
+                    .hasSize(4)
+                    .extracting("level", "id")
+                    .containsExactlyInAnyOrder(
+                            tuple(1, 5),
+                            tuple(0, 6),
+                            tuple(2, 16),
+                            tuple(0, 18)
+                    );
+            soft.assertThat(village.getResourceFields())
+                    .filteredOn("type", CROP)
+                    .hasSize(6)
+                    .extracting("level", "id")
+                    .containsExactlyInAnyOrder(
+                            tuple(2, 2),
+                            tuple(0, 8),
+                            tuple(0, 12),
+                            tuple(0, 9),
+                            tuple(0, 15),
+                            tuple(0, 13)
+                    );
+            soft.assertThat(village.getBuildings())
+                    .filteredOn(building -> building.getType() != BuildingType.EMPTY_SLOT)
+                    .extracting("type", "level", "id")
+                    .containsExactlyInAnyOrder(
+                            tuple(WAREHOUSE, 2, 21),
+                            tuple(GRANARY, 2, 22),
+                            tuple(MAIN_BUILDING, 1, 26),
+                            tuple(RALLY_POINT, 1, 39)
+                    );
         });
     }
 }
