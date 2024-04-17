@@ -7,11 +7,14 @@ import pl.seleniumbot.model.ResourceField;
 import pl.seleniumbot.model.VillageStock;
 
 import java.util.List;
+import java.util.Queue;
 
 @Builder
 @Value
 public class Village {
-    List<ResourceField> resourceFields;
+    String name;
     VillageStock stock;
+    List<ResourceField> resourceFields;
     List<Building> buildings;
+    Queue<UnderConstruction> constructionQueue;
 }

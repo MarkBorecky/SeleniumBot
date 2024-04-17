@@ -8,9 +8,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import pl.seleniumbot.jsoup.MyDocument;
+import pl.seleniumbot.model.village.UnderConstruction;
 import pl.seleniumbot.model.village.Village;
 
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +48,11 @@ public class VillageFactory {
         VillageStock stock = this.createStock(stockBarHtml);
         MutableList<Building> buildings = this.createVillageCenter(villageCenterFactory);
 
+        Queue<UnderConstruction> constructionQueue = new LinkedBlockingQueue<>();
+
         return Village.builder()
+                .constructionQueue(constructionQueue)
+                .name("village")
                 .resourceFields(resourceFields)
                 .stock(stock)
                 .buildings(buildings)
