@@ -12,10 +12,12 @@ import pl.seleniumbot.model.village.UnderConstruction;
 import pl.seleniumbot.model.village.Village;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class VillageFactory {
@@ -27,24 +29,8 @@ public class VillageFactory {
     private static final String FREE_CROP_PRODUCTION_ID = "stockBarFreeCrop";
 
 
-    public interface VillageCenterFactory {
-        Village withVillageCenterFactory(String villageCenterHtml);
-    }
-
-    public interface StockBarFactory {
-        VillageCenterFactory withStockBar(String stockBarHtml);
-    }
-
-    public interface ResourceFieldsFactory {
-        StockBarFactory withResourceFields(String resourceFieldsHtml);
-    }
-
-    public ResourceFieldsFactory build() {
-        return resource -> stock -> center -> createVillage(resource, stock, center);
-    }
-
-    private Village createVillage(String resourceFieldHtml, String stockBarHtml, String villageCenterFactory) {
-        MutableList<ResourceField> resourceFields = this.createResourceFields(resourceFieldHtml);
+    public Village createVillage(String resourceFieldHtml, String stockBarHtml, String villageCenterFactory) {
+        Map<ResourceType, List<ResourceField>> resourceFields = this.createResourceFields(resourceFieldHtml);
         VillageStock stock = this.createStock(stockBarHtml);
         MutableList<Building> buildings = this.createVillageCenter(villageCenterFactory);
 
@@ -52,7 +38,7 @@ public class VillageFactory {
 
         return Village.builder()
                 .constructionQueue(constructionQueue)
-                .name("village")
+                .name("Wioska")
                 .resourceFields(resourceFields)
                 .stock(stock)
                 .buildings(buildings)
@@ -70,15 +56,14 @@ public class VillageFactory {
                         .build());
     }
 
-    private MutableList<ResourceField> createResourceFields(String resourceFieldContainerText) {
+    private Map<ResourceType, List<ResourceField>> createResourceFields(String resourceFieldContainerText) {
         Matcher matcher = PATTERN.matcher(resourceFieldContainerText);
-        List<ResourceField> fields = matcher.results().map(m -> ResourceField.builder()
+        return matcher.results().map(m -> ResourceField.builder()
                         .type(ResourceType.fromId(Integer.parseInt(m.group(1))))
                         .id(Integer.parseInt(m.group(2)))
                         .level(Integer.parseInt(m.group(3)))
                         .build())
-                .toList();
-        return Lists.adapt(fields);
+                .collect(Collectors.groupingBy(ResourceField::getType));
     }
 
     private int getLevel(Element el) {

@@ -1,10 +1,12 @@
 package pl.seleniumbot.webdriver;
 
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
 
-@Value
 @Builder
+@Getter
 public class Construction {
-    int constructionId;
+    private int constructionId;
+    private int currentLevel;
+    private int levelAfterBuild;
 }

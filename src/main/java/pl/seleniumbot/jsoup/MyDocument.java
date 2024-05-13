@@ -1,5 +1,6 @@
 package pl.seleniumbot.jsoup;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
@@ -47,5 +48,12 @@ public class MyDocument {
 
     public MyDocument findById(String id) {
         return new MyDocument(this.element.getElementById(id));
+    }
+
+    public int getAttributeAsNumber(String value) {
+        String attributeValue = this.element.attributes()
+                .get(value)
+                .transform(StringUtils::getDigits);
+        return Integer.parseInt(attributeValue);
     }
 }

@@ -2,6 +2,7 @@ package pl.seleniumbot.webdriver;
 
 import pl.seleniumbot.model.village.Village;
 
+import java.util.List;
 import java.util.Map;
 
 public interface TravianWebDriver {
@@ -11,5 +12,5 @@ public interface TravianWebDriver {
 
     Map<String, Village> scanVillages();
 
-    void build(String villageName, Construction construction);
+    void build(String villageName, List<Construction> construction);
 }

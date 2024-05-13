@@ -5,6 +5,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import pl.seleniumbot.configuration.AccountConfiguration;
+import pl.seleniumbot.jsoup.MyDocument;
 import pl.seleniumbot.model.VillageFactory;
 import pl.seleniumbot.model.village.Village;
 
@@ -58,10 +59,7 @@ public class TravianWebDriverImpl implements TravianWebDriver {
 
         var villageFactory = new VillageFactory();
 
-        Village village = villageFactory.build()
-                .withResourceFields(resourceFieldHtml)
-                .withStockBar(stockBarHtml)
-                .withVillageCenterFactory(villageCenterHtml);
+        Village village = villageFactory.createVillage(resourceFieldHtml, stockBarHtml, villageCenterHtml);
 
         return Map.of(village.getName(), village);
     }
@@ -70,13 +68,36 @@ public class TravianWebDriverImpl implements TravianWebDriver {
         return new MyElement(driver.findElement(By.id(id)));
     }
 
-    @Override
-    public void build(String villageName, Construction construction) {
-//        Village village = this.villages.get(villageName);
+    private MyElement findElementByClass(String className) {
+        return new MyElement(driver.findElement(By.className(className)));
+    }
 
-        String url = STR."\{configuration.getUrl()}/build.php?id=\{construction.getConstructionId()}";
-        driver.get(url);
-        WebElement buildButton = driver.findElement(By.className("textButtonV1"));
-        buildButton.click();
+    @Override
+    public void build(String villageName, List<Construction> constructions) {
+        constructions.forEach(construction -> {
+            String url = STR."\{configuration.getUrl()}/build.php?id=\{construction.getConstructionId()}";
+            driver.get(url);
+            WebElement buildButton = driver.findElement(By.className("textButtonV1"));
+            buildButton.click();
+
+            int breakInSeconds = secondsToEndBuild() + 5;
+            System.out.println(STR."next build after \{breakInSeconds} seconds");
+            pause(breakInSeconds);
+            System.out.println("End of Break!");
+        });
+    }
+
+    private static void pause(int breakInSeconds) {
+        try {
+            Thread.sleep(breakInSeconds * 1000L);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int secondsToEndBuild() {
+        return MyDocument.createFrom(findElementByClass("buildingList").innerHtml())
+                .fetchFirstByClass("buildDuration", "timer")
+                .getAttributeAsNumber("value");
     }
 }
