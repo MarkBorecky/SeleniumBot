@@ -26,21 +26,21 @@ public class VillageFactory {
     private static final String CROP_ID = "l4";
     private static final String FREE_CROP_PRODUCTION_ID = "stockBarFreeCrop";
 
-    public interface StockBarFactory {
-        VillageCenterFactory withStockBar(String stockBarHtml);
-    }
 
     public interface VillageCenterFactory {
         Village withVillageCenterFactory(String villageCenterHtml);
+    }
+
+    public interface StockBarFactory {
+        VillageCenterFactory withStockBar(String stockBarHtml);
     }
 
     public interface ResourceFieldsFactory {
         StockBarFactory withResourceFields(String resourceFieldsHtml);
     }
 
-    public StockBarFactory withResourceFields(String resourceFieldsHtml) {
-        ResourceFieldsFactory resourceFieldsFactory = resource -> stock -> center -> createVillage(resource, stock, center);
-        return resourceFieldsFactory.withResourceFields(resourceFieldsHtml);
+    public ResourceFieldsFactory build() {
+        return resource -> stock -> center -> createVillage(resource, stock, center);
     }
 
     private Village createVillage(String resourceFieldHtml, String stockBarHtml, String villageCenterFactory) {

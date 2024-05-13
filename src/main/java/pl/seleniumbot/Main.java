@@ -2,10 +2,11 @@ package pl.seleniumbot;
 
 import pl.seleniumbot.configuration.AccountConfiguration;
 import pl.seleniumbot.model.village.Village;
+import pl.seleniumbot.webdriver.Construction;
 import pl.seleniumbot.webdriver.TravianWebDriver;
 import pl.seleniumbot.webdriver.TravianWebDriverFactory;
 
-import java.util.List;
+import java.util.Map;
 
 
 public class Main {
@@ -17,9 +18,14 @@ public class Main {
 
         driver.login();
 
-        List<Village> villages = driver.scanVillages();
+        Map<String, Village> villages = driver.scanVillages();
 
         System.out.println(villages);
+
+        Construction constructionList = Construction.builder()
+                .constructionId(15)
+                .build();
+        driver.build("WIOSKA", constructionList);
 
         driver.close();
     }
